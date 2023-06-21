@@ -22,7 +22,7 @@ for row in range(df.shape[0]):
     # 예측 결과의 차분을 2배로 조정
     diff = np.diff(forecast)
     forecast[1:] += diff * 12
-    forecast[0] = forecast[0] * 1  # Reduce the rate of change for the first forecasted value by half
+    forecast[0] = forecast[0] * 1 
     forecast = forecast * 1
 
     # 예측 결과와 원래 데이터를 그래프로 시각화

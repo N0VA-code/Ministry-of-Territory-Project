@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # 데이터 로드
-df = pd.read_excel("/Users/kimminseok/Downloads/연간_통계_자치구별-16-20.xls", header=None)
+df = pd.read_excel("/Users/kimminseok/Downloads/연간_통계_자치구별-11-15.xls", header=None)
 
 # 각 행에 대해 ARIMA 모델을 학습하고 예측
 for row in range(df.shape[0]):
@@ -19,10 +19,14 @@ for row in range(df.shape[0]):
     n_periods = 12
     forecast = model_fit.forecast(steps=n_periods)
 
-    # 예측 결과의 차분을 2배로 조정
+    # 예측 결과의 차분을 각 월별로 다르게 조정
     diff = np.diff(forecast)
-    forecast[1:] += diff * 12
-    forecast[0] = forecast[0] * 1 
+
+    # 1월-7월: 차분을 12배로 조정
+    forecast[1:8] += diff[:7] * 12
+    # 8월-12월: 차분을 24배로 조정
+    forecast[8:] += diff[7:] * 100
+    forecast[0] = forecast[0] * 1
     forecast = forecast * 1
 
     # 예측 결과와 원래 데이터를 그래프로 시각화
@@ -37,4 +41,12 @@ for row in range(df.shape[0]):
     plt.title(f"ARIMA model and prediction for row {row + 1}")
     plt.show()
 
+    # 미세먼지량 계산
+    forecast = forecast.ravel()  # 예측된 교통량을 1차원 배열로 변환
+    beta0 = 0  # 상수항
+    beta1 = 0.5  # 교통량에 대한 계수
+
+    dust_amount = 4*(beta0 + beta1 * forecast)  # 미세먼지량 계산
+
     print(f"Forecast for row {row + 1}: ", forecast)  # 예측된 교통량
+    print(f"Predicted Dust Amount for row {row + 1}: ", dust_amount)  # 예측된 미세먼지량

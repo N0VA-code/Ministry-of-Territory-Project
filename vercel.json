@@ -1,5 +1,8 @@
 {
   "routes": [
-    { "src": "/forecast/(.*)", "dest": "/forecast.py" }
+    {
+      "src": "/(.*)",
+      "dest": "api/app.py"
+    }
   ]
 }

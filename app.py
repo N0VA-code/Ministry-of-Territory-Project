@@ -1,5 +1,6 @@
 from flask import Flask, jsonify
 import pandas as pd
+import numpy as np
 from statsmodels.tsa.arima.model import ARIMA
 
 app = Flask(__name__)
@@ -7,14 +8,14 @@ app = Flask(__name__)
 @app.route('/forecast', methods=['GET'])
 def forecast():
     # 데이터 로드
-    df = pd.read_excel("/Users/kimminseok/Downloads/연간_통계_자치구별-11-15.xls", header=None)
+    df = pd.read_csv("/Users/kimminseok/Downloads/연간_통계_자치구별-11-15.txt", header=None, sep='\s+')
 
     all_forecasts = []
     all_dust_amounts = []
 
     for row in range(df.shape[0]):
         # 각 행에서 5년치 데이터를 추출하고 이를 사용해 모델을 학습
-        traffic_data = df.iloc[row, :60].values  # 5년치 데이터
+        traffic_data = pd.to_numeric(df.iloc[row, :60].values, errors='coerce')  # 5년치 데이터
 
         # 모델 생성 및 학습
         model = ARIMA(traffic_data, order=(5, 1, 0))
@@ -32,3 +33,6 @@ def forecast():
         all_dust_amounts.append(dust_amount.tolist())
 
     return jsonify({'forecasts': all_forecasts, 'dust_amounts': all_dust_amounts})
+
+if __name__ == '__main__':
+    app.run(debug=True)

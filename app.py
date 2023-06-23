@@ -24,6 +24,13 @@ def forecast(row):
     n_periods = 12
     forecast_values = model_fit.forecast(steps=n_periods)
 
+    # 차분을 조정
+    diff = np.diff(forecast_values)
+    forecast_values[1:4] += diff[0:3] * 25
+    forecast_values[4:7] += diff[3:6] * 50
+    forecast_values[7:10] += diff[6:9] * 100
+    forecast_values[10:] += diff[9:] * 150
+
     # 미세먼지량 계산
     beta0 = 0  # 상수항
     beta1 = 0.5  # 교통량에 대한 계수
